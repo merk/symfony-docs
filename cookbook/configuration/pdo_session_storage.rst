@@ -126,8 +126,8 @@ the session storage connection only. This is OK when you use a separate
 database for the session data.
 
 But if you'd like to store the session data in the same database as the rest
-of your project's data, you can use the connection settings from the
-parameter.ini by referencing the database-related parameters defined there:
+of your project's data, you can use the connection that was already created
+by the Doctrine DBAL:
 
 .. configuration-block::
 
@@ -135,26 +135,18 @@ parameter.ini by referencing the database-related parameters defined there:
 
         pdo:
             class: PDO
-            arguments:
-                - "mysql:dbname=%database_name%"
-                - %database_user%
-                - %database_password%
+            factory_service: doctrine.dbal.default_connection
+            factory_method: getWrappedConnection
 
     .. code-block:: xml
 
-        <service id="pdo" class="PDO">
-            <argument>mysql:dbname=%database_name%</argument>
-            <argument>%database_user%</argument>
-            <argument>%database_password%</argument>
-        </service>
+        <service id="pdo" class="PDO" factory-service="doctrine.dbal.default_connection" factory-method="getWrappedConnection" />
 
     .. code-block:: php
 
-        $pdoDefinition = new Definition('PDO', array(
-            'mysql:dbname=%database_name%',
-            '%database_user%',
-            '%database_password%',
-        ));
+        $pdoDefinition = new Definition('PDO');
+        $pdoDefinition->setFactoryService('doctrine.dbal.default_connection');
+        $pdoDefinition->setFactoryMethod('getWrappedConnection');
 
 Example SQL Statements
 ----------------------
